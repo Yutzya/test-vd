@@ -1,0 +1,898 @@
+-- Rayfield UI Version - Violence Exploit Script
+-- Using Sirius Menu Rayfield Library
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- ===== SERVICES =====
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+-- ===== CONFIGURATION =====
+local Config = {
+    -- ESP Settings
+    ESP_Enabled = true,
+    ESP_Killer = true,
+    ESP_Survivor = true,
+    ESP_Generator = true,
+    ESP_Gate = true,
+    ESP_Hook = true,
+    ESP_Pallet = true,
+    ESP_Window = false,
+    ESP_Distance = true,
+    ESP_Names = true,
+    ESP_Health = true,
+    ESP_Skeleton = false,
+    ESP_Offscreen = true,
+    ESP_Velocity = false,
+    ESP_ClosestHook = true,
+    ESP_MaxDist = 500,
+    ESP_PlayerChams = false,
+    ESP_ObjectChams = true,
+    
+    -- Radar Settings
+    RADAR_Enabled = false,
+    RADAR_Size = 120,
+    RADAR_Circle = false,
+    RADAR_Killer = true,
+    RADAR_Survivor = true,
+    RADAR_Generator = true,
+    RADAR_Pallet = true,
+    
+    -- Auto Features
+    AUTO_Generator = false,
+    AUTO_GenMode = "Fast",
+    AUTO_LeaveGen = false,
+    AUTO_LeaveDist = 18,
+    AUTO_Attack = false,
+    AUTO_AttackRange = 12,
+    HITBOX_Enabled = false,
+    HITBOX_Size = 15,
+    AUTO_TeleAway = false,
+    AUTO_TeleAwayDist = 40,
+    
+    -- Survivor Features
+    AUTO_Parry = false,
+    AUTO_SkillCheck = false,
+    SURV_NoFall = false,
+    SURV_AutoWiggle = false,
+    
+    -- Killer Features
+    KILLER_DestroyPallets = false,
+    KILLER_FullGenBreak = false,
+    KILLER_NoPalletStun = false,
+    KILLER_AutoHook = false,
+    KILLER_AntiBlind = false,
+    KILLER_NoSlowdown = false,
+    KILLER_DoubleTap = false,
+    KILLER_InfiniteLunge = false,
+    
+    -- Movement Cheats
+    SPEED_Enabled = false,
+    SPEED_Value = 32,
+    SPEED_Method = "Attribute",
+    NOCLIP_Enabled = false,
+    FLY_Enabled = false,
+    FLY_Speed = 50,
+    FLY_Method = "CFrame",
+    JUMP_Power = 50,
+    JUMP_Infinite = false,
+    
+    -- Camera/Visual
+    NO_Fog = false,
+    CAM_FOVEnabled = false,
+    CAM_FOV = 90,
+    CAM_ThirdPerson = false,
+    CAM_ShiftLock = false,
+    FLING_Enabled = false,
+    FLING_Strength = 10000,
+    
+    -- Beatdown
+    BEAT_Survivor = false,
+    BEAT_Killer = false,
+    TP_Offset = 3,
+    
+    -- Aim Settings
+    AIM_Enabled = false,
+    AIM_UseRMB = true,
+    AIM_FOV = 120,
+    AIM_Smooth = 0.3,
+    AIM_TargetPart = "Head",
+    AIM_VisCheck = true,
+    AIM_ShowFOV = true,
+    AIM_Predict = true,
+    SPEAR_Aimbot = false,
+    SPEAR_Gravity = 50,
+    SPEAR_Speed = 100,
+    
+    -- Keybinds
+    KEY_Menu = Enum.KeyCode.Insert,
+    KEY_Panic = Enum.KeyCode.Home,
+    KEY_LeaveGen = Enum.KeyCode.Q,
+    KEY_StopGen = Enum.KeyCode.X,
+    KEY_TP_Gen = Enum.KeyCode.G,
+    KEY_TP_Gate = Enum.KeyCode.T,
+    KEY_TP_Hook = Enum.KeyCode.H,
+    KEY_Speed = Enum.KeyCode.C,
+    KEY_Noclip = Enum.KeyCode.V,
+    KEY_Fly = Enum.KeyCode.F,
+}
+
+-- ===== RAYFIELD WINDOW SETUP =====
+local Window = Rayfield:CreateWindow({
+    Name = "Violence | DBD Exploit",
+    LoadingTitle = "Loading Violence",
+    LoadingSubtitle = "Initializing...",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "ViolenceConfig",
+        FileName = "Config.json"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "Violence Key System",
+        Subtitle = "Enter Key",
+        Note = "No key required",
+        SaveKey = false,
+        GrabKeyFromSite = false,
+        Key = {""}
+    }
+})
+
+-- ===== NOTIFICATION HELPER =====
+local function Notify(title, message, duration)
+    Rayfield:Notify({
+        Title = title,
+        Content = message,
+        Duration = duration or 3,
+        Image = 4483345998,
+    })
+end
+
+-- ===== TABS CREATION =====
+local TabESP = Window:CreateTab("ESP", 4483345998)
+local TabRadar = Window:CreateTab("Radar", 4483345998)
+local TabAuto = Window:CreateTab("Auto Features", 4483345998)
+local TabKiller = Window:CreateTab("Killer", 4483345998)
+local TabSurvivor = Window:CreateTab("Survivor", 4483345998)
+local TabCheats = Window:CreateTab("Cheats", 4483345998)
+local TabAim = Window:CreateTab("Aim", 4483345998)
+local TabSettings = Window:CreateTab("Settings", 4483345998)
+
+-- ===== ESP TAB =====
+local ESPSection = TabESP:CreateSection("Main ESP")
+TabESP:CreateToggle({
+    Name = "ESP Enabled",
+    CurrentValue = Config.ESP_Enabled,
+    Callback = function(Value)
+        Config.ESP_Enabled = Value
+        Notify("ESP", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Killer ESP",
+    CurrentValue = Config.ESP_Killer,
+    Callback = function(Value)
+        Config.ESP_Killer = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Survivor ESP",
+    CurrentValue = Config.ESP_Survivor,
+    Callback = function(Value)
+        Config.ESP_Survivor = Value
+    end
+})
+
+local ObjectsSection = TabESP:CreateSection("Objects")
+TabESP:CreateToggle({
+    Name = "Generator ESP",
+    CurrentValue = Config.ESP_Generator,
+    Callback = function(Value)
+        Config.ESP_Generator = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Gate ESP",
+    CurrentValue = Config.ESP_Gate,
+    Callback = function(Value)
+        Config.ESP_Gate = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Hook ESP",
+    CurrentValue = Config.ESP_Hook,
+    Callback = function(Value)
+        Config.ESP_Hook = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Pallet ESP",
+    CurrentValue = Config.ESP_Pallet,
+    Callback = function(Value)
+        Config.ESP_Pallet = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Window ESP",
+    CurrentValue = Config.ESP_Window,
+    Callback = function(Value)
+        Config.ESP_Window = Value
+    end
+})
+
+local DisplaySection = TabESP:CreateSection("Display Options")
+TabESP:CreateToggle({
+    Name = "Show Names",
+    CurrentValue = Config.ESP_Names,
+    Callback = function(Value)
+        Config.ESP_Names = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Show Distance",
+    CurrentValue = Config.ESP_Distance,
+    Callback = function(Value)
+        Config.ESP_Distance = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Show Health",
+    CurrentValue = Config.ESP_Health,
+    Callback = function(Value)
+        Config.ESP_Health = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Show Skeleton",
+    CurrentValue = Config.ESP_Skeleton,
+    Callback = function(Value)
+        Config.ESP_Skeleton = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Offscreen Indicators",
+    CurrentValue = Config.ESP_Offscreen,
+    Callback = function(Value)
+        Config.ESP_Offscreen = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Velocity Visualization",
+    CurrentValue = Config.ESP_Velocity,
+    Callback = function(Value)
+        Config.ESP_Velocity = Value
+    end
+})
+
+TabESP:CreateSlider({
+    Name = "Max Distance",
+    Min = 100,
+    Max = 1000,
+    Increment = 50,
+    Suffix = "m",
+    CurrentValue = Config.ESP_MaxDist,
+    Callback = function(Value)
+        Config.ESP_MaxDist = Value
+    end
+})
+
+local ChamsSection = TabESP:CreateSection("Chams")
+TabESP:CreateToggle({
+    Name = "Player Chams",
+    CurrentValue = Config.ESP_PlayerChams,
+    Callback = function(Value)
+        Config.ESP_PlayerChams = Value
+    end
+})
+
+TabESP:CreateToggle({
+    Name = "Object Chams",
+    CurrentValue = Config.ESP_ObjectChams,
+    Callback = function(Value)
+        Config.ESP_ObjectChams = Value
+    end
+})
+
+-- ===== RADAR TAB =====
+local RadarMainSection = TabRadar:CreateSection("Radar Settings")
+TabRadar:CreateToggle({
+    Name = "Radar Enabled",
+    CurrentValue = Config.RADAR_Enabled,
+    Callback = function(Value)
+        Config.RADAR_Enabled = Value
+        Notify("Radar", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabRadar:CreateSlider({
+    Name = "Radar Size",
+    Min = 80,
+    Max = 300,
+    Increment = 10,
+    Suffix = "px",
+    CurrentValue = Config.RADAR_Size,
+    Callback = function(Value)
+        Config.RADAR_Size = Value
+    end
+})
+
+TabRadar:CreateToggle({
+    Name = "Circle Mode",
+    CurrentValue = Config.RADAR_Circle,
+    Callback = function(Value)
+        Config.RADAR_Circle = Value
+    end
+})
+
+local RadarObjectsSection = TabRadar:CreateSection("Display")
+TabRadar:CreateToggle({
+    Name = "Show Killers",
+    CurrentValue = Config.RADAR_Killer,
+    Callback = function(Value)
+        Config.RADAR_Killer = Value
+    end
+})
+
+TabRadar:CreateToggle({
+    Name = "Show Survivors",
+    CurrentValue = Config.RADAR_Survivor,
+    Callback = function(Value)
+        Config.RADAR_Survivor = Value
+    end
+})
+
+TabRadar:CreateToggle({
+    Name = "Show Generators",
+    CurrentValue = Config.RADAR_Generator,
+    Callback = function(Value)
+        Config.RADAR_Generator = Value
+    end
+})
+
+TabRadar:CreateToggle({
+    Name = "Show Pallets",
+    CurrentValue = Config.RADAR_Pallet,
+    Callback = function(Value)
+        Config.RADAR_Pallet = Value
+    end
+})
+
+-- ===== AUTO FEATURES TAB =====
+local GenSection = TabAuto:CreateSection("Generator Automation")
+TabAuto:CreateToggle({
+    Name = "Auto Repair Generator",
+    CurrentValue = Config.AUTO_Generator,
+    Callback = function(Value)
+        Config.AUTO_Generator = Value
+        Notify("Auto Gen", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabAuto:CreateDropdown({
+    Name = "Repair Mode",
+    Options = {"Fast", "Normal", "Slow"},
+    CurrentOption = Config.AUTO_GenMode,
+    Callback = function(Value)
+        Config.AUTO_GenMode = Value
+    end
+})
+
+TabAuto:CreateToggle({
+    Name = "Auto Leave Gen",
+    CurrentValue = Config.AUTO_LeaveGen,
+    Callback = function(Value)
+        Config.AUTO_LeaveGen = Value
+    end
+})
+
+TabAuto:CreateSlider({
+    Name = "Leave Distance",
+    Min = 5,
+    Max = 50,
+    Increment = 1,
+    Suffix = "m",
+    CurrentValue = Config.AUTO_LeaveDist,
+    Callback = function(Value)
+        Config.AUTO_LeaveDist = Value
+    end
+})
+
+local AttackSection = TabAuto:CreateSection("Attack Automation")
+TabAuto:CreateToggle({
+    Name = "Auto Attack",
+    CurrentValue = Config.AUTO_Attack,
+    Callback = function(Value)
+        Config.AUTO_Attack = Value
+    end
+})
+
+TabAuto:CreateSlider({
+    Name = "Attack Range",
+    Min = 5,
+    Max = 30,
+    Increment = 1,
+    Suffix = "m",
+    CurrentValue = Config.AUTO_AttackRange,
+    Callback = function(Value)
+        Config.AUTO_AttackRange = Value
+    end
+})
+
+TabAuto:CreateToggle({
+    Name = "Hitbox Expansion",
+    CurrentValue = Config.HITBOX_Enabled,
+    Callback = function(Value)
+        Config.HITBOX_Enabled = Value
+    end
+})
+
+TabAuto:CreateSlider({
+    Name = "Hitbox Size",
+    Min = 5,
+    Max = 50,
+    Increment = 1,
+    CurrentValue = Config.HITBOX_Size,
+    Callback = function(Value)
+        Config.HITBOX_Size = Value
+    end
+})
+
+local TeleSection = TabAuto:CreateSection("Teleportation")
+TabAuto:CreateToggle({
+    Name = "Auto Teleport Away",
+    CurrentValue = Config.AUTO_TeleAway,
+    Callback = function(Value)
+        Config.AUTO_TeleAway = Value
+    end
+})
+
+TabAuto:CreateSlider({
+    Name = "Teleport Distance",
+    Min = 10,
+    Max = 100,
+    Increment = 5,
+    Suffix = "m",
+    CurrentValue = Config.AUTO_TeleAwayDist,
+    Callback = function(Value)
+        Config.AUTO_TeleAwayDist = Value
+    end
+})
+
+-- ===== KILLER TAB =====
+local KillerAbilitiesSection = TabKiller:CreateSection("Killer Abilities")
+TabKiller:CreateToggle({
+    Name = "Destroy Pallets",
+    CurrentValue = Config.KILLER_DestroyPallets,
+    Callback = function(Value)
+        Config.KILLER_DestroyPallets = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "Full Gen Break",
+    CurrentValue = Config.KILLER_FullGenBreak,
+    Callback = function(Value)
+        Config.KILLER_FullGenBreak = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "No Pallet Stun",
+    CurrentValue = Config.KILLER_NoPalletStun,
+    Callback = function(Value)
+        Config.KILLER_NoPalletStun = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "Auto Hook",
+    CurrentValue = Config.KILLER_AutoHook,
+    Callback = function(Value)
+        Config.KILLER_AutoHook = Value
+    end
+})
+
+local KillerPassivesSection = TabKiller:CreateSection("Passives")
+TabKiller:CreateToggle({
+    Name = "Anti Blind",
+    CurrentValue = Config.KILLER_AntiBlind,
+    Callback = function(Value)
+        Config.KILLER_AntiBlind = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "No Slowdown",
+    CurrentValue = Config.KILLER_NoSlowdown,
+    Callback = function(Value)
+        Config.KILLER_NoSlowdown = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "Double Tap",
+    CurrentValue = Config.KILLER_DoubleTap,
+    Callback = function(Value)
+        Config.KILLER_DoubleTap = Value
+    end
+})
+
+TabKiller:CreateToggle({
+    Name = "Infinite Lunge",
+    CurrentValue = Config.KILLER_InfiniteLunge,
+    Callback = function(Value)
+        Config.KILLER_InfiniteLunge = Value
+    end
+})
+
+local BeatdownSection = TabKiller:CreateSection("Beatdown")
+TabKiller:CreateToggle({
+    Name = "Beat Down Killer",
+    CurrentValue = Config.BEAT_Killer,
+    Callback = function(Value)
+        Config.BEAT_Killer = Value
+    end
+})
+
+-- ===== SURVIVOR TAB =====
+local SurvivalSection = TabSurvivor:CreateSection("Survival")
+TabSurvivor:CreateToggle({
+    Name = "Auto Parry",
+    CurrentValue = Config.AUTO_Parry,
+    Callback = function(Value)
+        Config.AUTO_Parry = Value
+    end
+})
+
+TabSurvivor:CreateToggle({
+    Name = "Auto Skill Check",
+    CurrentValue = Config.AUTO_SkillCheck,
+    Callback = function(Value)
+        Config.AUTO_SkillCheck = Value
+    end
+})
+
+TabSurvivor:CreateToggle({
+    Name = "No Fall Damage",
+    CurrentValue = Config.SURV_NoFall,
+    Callback = function(Value)
+        Config.SURV_NoFall = Value
+    end
+})
+
+TabSurvivor:CreateToggle({
+    Name = "Auto Wiggle",
+    CurrentValue = Config.SURV_AutoWiggle,
+    Callback = function(Value)
+        Config.SURV_AutoWiggle = Value
+    end
+})
+
+local BeatdownSurvSection = TabSurvivor:CreateSection("Beatdown")
+TabSurvivor:CreateToggle({
+    Name = "Beat Down Survivor",
+    CurrentValue = Config.BEAT_Survivor,
+    Callback = function(Value)
+        Config.BEAT_Survivor = Value
+    end
+})
+
+-- ===== CHEATS TAB =====
+local MovementSection = TabCheats:CreateSection("Movement")
+TabCheats:CreateToggle({
+    Name = "Speed Enabled",
+    CurrentValue = Config.SPEED_Enabled,
+    Callback = function(Value)
+        Config.SPEED_Enabled = Value
+        Notify("Speed", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabCheats:CreateSlider({
+    Name = "Speed Value",
+    Min = 16,
+    Max = 100,
+    Increment = 2,
+    CurrentValue = Config.SPEED_Value,
+    Callback = function(Value)
+        Config.SPEED_Value = Value
+    end
+})
+
+TabCheats:CreateDropdown({
+    Name = "Speed Method",
+    Options = {"Attribute", "Humanoid", "CFrame"},
+    CurrentOption = Config.SPEED_Method,
+    Callback = function(Value)
+        Config.SPEED_Method = Value
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = Config.NOCLIP_Enabled,
+    Callback = function(Value)
+        Config.NOCLIP_Enabled = Value
+        Notify("Noclip", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Flight",
+    CurrentValue = Config.FLY_Enabled,
+    Callback = function(Value)
+        Config.FLY_Enabled = Value
+        Notify("Flight", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabCheats:CreateSlider({
+    Name = "Flight Speed",
+    Min = 10,
+    Max = 200,
+    Increment = 5,
+    CurrentValue = Config.FLY_Speed,
+    Callback = function(Value)
+        Config.FLY_Speed = Value
+    end
+})
+
+TabCheats:CreateDropdown({
+    Name = "Flight Method",
+    Options = {"CFrame", "Velocity", "BodyVelocity"},
+    CurrentOption = Config.FLY_Method,
+    Callback = function(Value)
+        Config.FLY_Method = Value
+    end
+})
+
+local JumpSection = TabCheats:CreateSection("Jump")
+TabCheats:CreateSlider({
+    Name = "Jump Power",
+    Min = 50,
+    Max = 200,
+    Increment = 5,
+    CurrentValue = Config.JUMP_Power,
+    Callback = function(Value)
+        Config.JUMP_Power = Value
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = Config.JUMP_Infinite,
+    Callback = function(Value)
+        Config.JUMP_Infinite = Value
+    end
+})
+
+local VisualSection = TabCheats:CreateSection("Visual")
+TabCheats:CreateToggle({
+    Name = "Remove Fog",
+    CurrentValue = Config.NO_Fog,
+    Callback = function(Value)
+        Config.NO_Fog = Value
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Adjust FOV",
+    CurrentValue = Config.CAM_FOVEnabled,
+    Callback = function(Value)
+        Config.CAM_FOVEnabled = Value
+    end
+})
+
+TabCheats:CreateSlider({
+    Name = "FOV",
+    Min = 70,
+    Max = 120,
+    Increment = 5,
+    CurrentValue = Config.CAM_FOV,
+    Callback = function(Value)
+        Config.CAM_FOV = Value
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Third Person",
+    CurrentValue = Config.CAM_ThirdPerson,
+    Callback = function(Value)
+        Config.CAM_ThirdPerson = Value
+    end
+})
+
+TabCheats:CreateToggle({
+    Name = "Shift Lock",
+    CurrentValue = Config.CAM_ShiftLock,
+    Callback = function(Value)
+        Config.CAM_ShiftLock = Value
+    end
+})
+
+local MiscSection = TabCheats:CreateSection("Miscellaneous")
+TabCheats:CreateToggle({
+    Name = "Fling",
+    CurrentValue = Config.FLING_Enabled,
+    Callback = function(Value)
+        Config.FLING_Enabled = Value
+    end
+})
+
+TabCheats:CreateSlider({
+    Name = "Fling Strength",
+    Min = 1000,
+    Max = 50000,
+    Increment = 1000,
+    CurrentValue = Config.FLING_Strength,
+    Callback = function(Value)
+        Config.FLING_Strength = Value
+    end
+})
+
+-- ===== AIM TAB =====
+local AimMainSection = TabAim:CreateSection("Aimbot")
+TabAim:CreateToggle({
+    Name = "Aimbot Enabled",
+    CurrentValue = Config.AIM_Enabled,
+    Callback = function(Value)
+        Config.AIM_Enabled = Value
+        Notify("Aimbot", Value and "Enabled" or "Disabled", 2)
+    end
+})
+
+TabAim:CreateToggle({
+    Name = "Use Right Mouse Button",
+    CurrentValue = Config.AIM_UseRMB,
+    Callback = function(Value)
+        Config.AIM_UseRMB = Value
+    end
+})
+
+TabAim:CreateSlider({
+    Name = "FOV Size",
+    Min = 50,
+    Max = 500,
+    Increment = 10,
+    Suffix = "°",
+    CurrentValue = Config.AIM_FOV,
+    Callback = function(Value)
+        Config.AIM_FOV = Value
+    end
+})
+
+TabAim:CreateSlider({
+    Name = "Smoothing",
+    Min = 0.1,
+    Max = 1,
+    Increment = 0.05,
+    CurrentValue = Config.AIM_Smooth,
+    Callback = function(Value)
+        Config.AIM_Smooth = Value
+    end
+})
+
+TabAim:CreateDropdown({
+    Name = "Target Part",
+    Options = {"Head", "Torso", "UpperTorso", "Chest"},
+    CurrentOption = Config.AIM_TargetPart,
+    Callback = function(Value)
+        Config.AIM_TargetPart = Value
+    end
+})
+
+local AimFeaturesSection = TabAim:CreateSection("Features")
+TabAim:CreateToggle({
+    Name = "Visibility Check",
+    CurrentValue = Config.AIM_VisCheck,
+    Callback = function(Value)
+        Config.AIM_VisCheck = Value
+    end
+})
+
+TabAim:CreateToggle({
+    Name = "Show FOV",
+    CurrentValue = Config.AIM_ShowFOV,
+    Callback = function(Value)
+        Config.AIM_ShowFOV = Value
+    end
+})
+
+TabAim:CreateToggle({
+    Name = "Prediction",
+    CurrentValue = Config.AIM_Predict,
+    Callback = function(Value)
+        Config.AIM_Predict = Value
+    end
+})
+
+local SpearSection = TabAim:CreateSection("Spear Aimbot")
+TabAim:CreateToggle({
+    Name = "Spear Aimbot",
+    CurrentValue = Config.SPEAR_Aimbot,
+    Callback = function(Value)
+        Config.SPEAR_Aimbot = Value
+    end
+})
+
+TabAim:CreateSlider({
+    Name = "Gravity",
+    Min = 10,
+    Max = 100,
+    Increment = 5,
+    CurrentValue = Config.SPEAR_Gravity,
+    Callback = function(Value)
+        Config.SPEAR_Gravity = Value
+    end
+})
+
+TabAim:CreateSlider({
+    Name = "Projectile Speed",
+    Min = 50,
+    Max = 200,
+    Increment = 5,
+    CurrentValue = Config.SPEAR_Speed,
+    Callback = function(Value)
+        Config.SPEAR_Speed = Value
+    end
+})
+
+-- ===== SETTINGS TAB =====
+local KeybindsSection = TabSettings:CreateSection("Keybinds Info")
+TabSettings:CreateLabel("Menu Toggle: Insert")
+TabSettings:CreateLabel("Panic Button: Home")
+TabSettings:CreateLabel("Leave Gen: Q")
+TabSettings:CreateLabel("Stop Gen: X")
+TabSettings:CreateLabel("TP Generator: G")
+TabSettings:CreateLabel("TP Gate: T")
+TabSettings:CreateLabel("TP Hook: H")
+TabSettings:CreateLabel("Speed: C")
+TabSettings:CreateLabel("Noclip: V")
+TabSettings:CreateLabel("Flight: F")
+
+local InfoSection = TabSettings:CreateSection("Information")
+TabSettings:CreateLabel("Script: Violence DBD Exploit")
+TabSettings:CreateLabel("UI: Rayfield (Sirius Menu)")
+TabSettings:CreateLabel("Version: 1.0")
+TabSettings:CreateLabel("Executor: " .. (getexecutorname and getexecutorname() or "Unknown"))
+
+TabSettings:CreateButton({
+    Name = "Unload Script",
+    Callback = function()
+        Notify("Script", "Unloading...", 2)
+        task.wait(1)
+        -- Add cleanup code here
+    end
+})
+
+TabSettings:CreateButton({
+    Name = "Reload Script",
+    Callback = function()
+        Notify("Script", "Reloading...", 2)
+        task.wait(1)
+        -- Add reload code here
+    end
+})
+
+-- ===== INITIALIZATION MESSAGE =====
+Notify("Violence", "Rayfield UI loaded successfully!", 3)
+print("[Violence] Script loaded with Rayfield UI")
